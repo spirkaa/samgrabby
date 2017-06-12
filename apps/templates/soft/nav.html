@@ -1,0 +1,37 @@
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">SamGrabby</a>
+    </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+      {% for drv in drv_list %}
+        <li>
+            <a href="http://samlab.ws/soft/{{drv.url_key}}" target="_blank">{{drv.name}} {{drv.version}}</a>
+        </li>
+      {% endfor %}
+      {% for torr in torrent_list %}
+        <li>
+            <a href="http://nnm-club.me/forum/viewtopic.php?t={{torr.url_key}}" target="_blank">{{torr.name}} {{torr.version}}</a>
+        </li>
+      {% endfor %}
+    <!-- <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Links <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="http://nnm-club.me/forum/viewtopic.php?t=746866" target="_blank">2k10</a></li>
+            <li><a href="http://nnm-club.me/forum/viewtopic.php?t=906547" target="_blank">MInstAll</a></li>
+            <li><a href="http://driveroff.net/sam/" target="_blank">SamDrivers</a></li>
+          </ul>
+        </li>  -->
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>

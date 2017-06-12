@@ -1,0 +1,17 @@
+.dpad {
+  margin: 20px;
+}
+.btn {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+.table tbody>tr>td.vert-align {
+    vertical-align: middle;
+}
+.bottom-buffer {
+    margin-bottom: 20px;
+}
+div.tooltip-inner {
+    max-width: none;
+    white-space: nowrap;
+}
