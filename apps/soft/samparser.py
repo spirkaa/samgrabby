@@ -6,11 +6,11 @@ import mechanicalsoup
 samlab_list = [
     '7zip', 'aimp', 'audacity', 'fsviewer', 'filezilla',
     'firefox', 'googlechrome', 'notepad', 'reaper', 'skype',
-    'stdu', 'vlcplayer', 'teamviewer', 'unlocker', 'classicshell',
+    'vlcplayer', 'teamviewer', 'classicshell',
     'java', 'klite', 'potplayer', 'tcpp', 'samdrivers'
     ]
 
-nnmclub_list = ['865311', '994500']
+nnmclub_list = ['1036838', '1350931']
 
 
 def samlab_parser(url_key):
@@ -23,34 +23,34 @@ def samlab_parser(url_key):
         name = name.replace(version, '').strip()
     except AttributeError:
         version = ''
-    upd_date = response.soup.select('center div[style^="text"]')[-1].get_text()[-8:]
+    upd_date = response.soup.select('div[style^="text"]')[-1].get_text()[-8:]
     upd_date = datetime.datetime.strptime(upd_date, '%d.%m.%y').date()
     links = response.soup.select('div[class="links"] a')
     links = [[a.get_text(), a.attrs.get('href')] for a in links]
 
-    results = {
+    res = {
         'name': name,
         'version': version,
         'upd_date': upd_date,
         'url_key': url_key,
         'links': links
         }
-    return results
+    return res
 
 
 def nnmclub_parser(url_key):
     root_url = 'https://nnmclub.to/forum/viewtopic.php?t='
-    browser = mechanicalsoup.Browser()
+    browser = mechanicalsoup.Browser(soup_config={'features': 'html.parser'})
     response = browser.get(root_url + url_key)
 
     maintitle = response.soup.select('a[class="maintitle"]')[0].text.split(' ')
     name = 'tmp'
     version = '0'
-    if url_key == '994500':
+    if url_key == '1036838':
         name = maintitle[0]
-        version = maintitle[1]
-    elif url_key == '865311':
-        name = ' '.join(maintitle[1:2])
+        version = maintitle[6]
+    elif url_key == '1350931':
+        name = maintitle[1]
         version = maintitle[2]
     else:
         pass
@@ -69,14 +69,14 @@ def nnmclub_parser(url_key):
 
     links = [['magnet', response.soup.select('td[class="gensmall"] a')[0].attrs.get('href')]]
 
-    results = {
+    res = {
         'name': name,
         'version': version,
         'upd_date': upd_date,
         'url_key': url_key,
         'links': links
         }
-    return results
+    return res
 
 
 def parser():

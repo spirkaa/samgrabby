@@ -1,5 +1,5 @@
 from django.db import models
-from .decorators import async
+from .decorators import async_f
 from .samparser import parser
 
 
@@ -61,7 +61,7 @@ def db_operations(results, operation):
                 add_links(r['links'], item.pk)
 
 
-@async
+@async_f
 def run_db_oper(operation):
     results = parser()
     db_operations(results, operation)
