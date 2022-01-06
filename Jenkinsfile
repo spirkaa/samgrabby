@@ -3,6 +3,11 @@ node {
   env.IMAGE_NAME = 'soft'
   env.DOCKERFILE = './.docker/django/Dockerfile'
   env.ANSIBLE_IMAGE = 'cytopia/ansible:latest-infra'
+  env.ANSIBLE_CONFIG = '.ansible/ansible.cfg'
+  env.ANSIBLE_PLAYBOOK = '.ansible/playbook.yml'
+  env.ANSIBLE_INVENTORY = '.ansible/hosts'
+  env.ANSIBLE_CREDENTIALS_ID = 'jenkins-ssh-key'
+  env.ANSIBLE_VAULT_CREDENTIALS_ID = 'ansible-vault-password'
 
   stage('Checkout') {
     def scmVars = checkout scm
@@ -25,15 +30,13 @@ node {
   }
 
   stage('Deploy') {
-    env.ANSIBLE_CONFIG = '.ansible/ansible.cfg'
-
     docker.image("${env.ANSIBLE_IMAGE}").inside {
       sh 'ansible --version'
       ansiblePlaybook(
-        playbook: '.ansible/playbook.yml',
-        inventory: '.ansible/hosts',
-        credentialsId: 'jenkins-ssh-key',
-        vaultCredentialsId: 'ansible-vault-password',
+        playbook: "${env.ANSIBLE_PLAYBOOK}",
+        inventory: "${env.ANSIBLE_INVENTORY}",
+        credentialsId: "${env.ANSIBLE_CREDENTIALS_ID}",
+        vaultCredentialsId: "${env.ANSIBLE_VAULT_CREDENTIALS_ID}",
         colorized: true)
     }
   }
