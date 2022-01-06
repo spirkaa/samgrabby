@@ -1,9 +1,6 @@
 """
 Django settings for samgrabby project.
 
-For more information on this file, see
-https://docs.djangoproject.com/en/dev/topics/settings/
-
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/dev/ref/settings/
 """
@@ -13,6 +10,8 @@ import environ
 ROOT_DIR = environ.Path(__file__) - 3  # (samgrabby/config/settings/common.py - 3 = samgrabby/)
 APPS_DIR = ROOT_DIR.path('apps')
 env = environ.Env()
+
+DEBUG = env.bool("DJANGO_DEBUG", default=False)
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -48,11 +47,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# DEBUG
-# ------------------------------------------------------------------------------
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
-DEBUG = env.bool('DJANGO_DEBUG', False)
-
 # FIXTURE CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-FIXTURE_DIRS
@@ -80,7 +74,7 @@ FIXTURE_DIRS = (
 
 DATABASES = {
     # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
-    'default': env.db('DATABASE_URL', default='sqlite:///config/data/db.sqlite3'),
+    'default': env.db('DATABASE_URL', default='sqlite:///db.sqlite3'),
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
@@ -110,17 +104,13 @@ USE_TZ = True
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#templates
 TEMPLATES = [
     {
-        # See: https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATES-BACKEND
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
         'DIRS': [
             str(APPS_DIR.path('templates')),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
-            # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
             'debug': DEBUG,
-            # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -130,7 +120,6 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
-                # Your stuff: custom template context processors go here
             ],
         },
     },
@@ -177,7 +166,7 @@ ROOT_URLCONF = 'config.urls'
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
-ADMIN_URL = r'^admin/'
+ADMIN_URL = env.str("DJANGO_ADMIN_URL", default="admin/")
 
 LOGGING = {
     'version': 1,
@@ -209,7 +198,7 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'formatter': 'default',
-            'filename': str(ROOT_DIR('logs/samgrabby.log')),
+            'filename': str(ROOT_DIR('app.log')),
         },
         'mail_admins': {
             'level': 'ERROR',
@@ -218,9 +207,6 @@ LOGGING = {
         }
     },
     'loggers': {
-        # Silence SuspiciousOperation.DisallowedHost exception ('Invalid
-        # HTTP_HOST' header messages). Set the handler to 'null' so we don't
-        # get those annoying emails.
         'django.security.DisallowedHost': {
             'handlers': ['null'],
             'propagate': False,
@@ -232,9 +218,10 @@ LOGGING = {
         },
         '': {
             'handlers': ['console', 'file'],
-            'level': 'INFO',
+            'level': env.str('DJANGO_LOG_LEVEL', default='INFO'),
         }
     }
 }
 
-# Your common stuff: Below this line define 3rd party library settings
+# ------------------------------------------------------------------------------
+DEBUG_TOOLBAR = env.bool("DJANGO_DEBUG_TOOLBAR", default=False)

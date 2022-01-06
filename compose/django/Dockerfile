@@ -1,20 +1,25 @@
-FROM python:3.6-alpine
+FROM python:3.9-alpine
+LABEL maintainer="Ilya Pavlov <piv@devmem.ru>"
 
 ENV PYTHONUNBUFFERED 1
+ARG CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
-# Requirements have to be pulled and installed here, otherwise caching won't work
-COPY ./requirements /requirements
+COPY ./requirements /app/requirements
 
-RUN apk add --no-cache tzdata \
+RUN set -eux \
+    && apk add --no-cache tzdata \
     && ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
 
-RUN pip install --no-cache-dir -U -r /requirements/production.txt
+RUN set -eux \
+    && pip install --no-cache-dir -U pip wheel \
+    && pip install --no-cache-dir -U -r /app/requirements/production.txt
 
 COPY . /app
 COPY ./compose/django/gunicorn.sh /gunicorn.sh
 COPY ./compose/django/entrypoint.sh /entrypoint.sh
 
-RUN addgroup django \
+RUN set -eux \
+    && addgroup django \
     && adduser -D -G django django \
     && chown -R django /app \
     && sed -i 's/\r//' /entrypoint.sh \
@@ -26,4 +31,7 @@ RUN addgroup django \
 
 WORKDIR /app
 
+USER django
+
 ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/gunicorn.sh"]

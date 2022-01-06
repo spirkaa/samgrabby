@@ -19,7 +19,7 @@ class Soft(models.Model):
 
 
 class DownLink(models.Model):
-    soft = models.ForeignKey(Soft, related_name='links')
+    soft = models.ForeignKey(Soft, related_name='links', on_delete=models.CASCADE)
     dl_url = models.URLField('download url')
     dl_url_text = models.CharField('text for download url', max_length=100)
 

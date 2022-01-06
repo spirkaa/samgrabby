@@ -1,15 +1,38 @@
 from django.conf import settings
-from django.conf.urls import include, url
 from django.contrib import admin
+from django.urls import include, path
 
 
 urlpatterns = [
-    url(r'^', include('apps.soft.urls', namespace="soft")),
-    url(r'^admin/', include(admin.site.urls)),
+    path('', include(('apps.soft.urls', 'apps.soft'), namespace="soft")),
+    path(settings.ADMIN_URL, admin.site.urls),
 ]
 
-if settings.DEBUG:
-    import debug_toolbar
+if settings.DEBUG:  # pragma: no cover
+    from django.views import defaults
+
     urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
+        path(
+            "400/",
+            defaults.bad_request,
+            kwargs={"exception": Exception("Bad Request!")},
+        ),
+        path(
+            "403/",
+            defaults.permission_denied,
+            kwargs={"exception": Exception("Permission Denied")},
+        ),
+        path(
+            "404/",
+            defaults.page_not_found,
+            kwargs={"exception": Exception("Page not Found")},
+        ),
+        path("500/", defaults.server_error),
     ]
+
+    if settings.DEBUG_TOOLBAR:
+        import debug_toolbar
+
+        urlpatterns = [
+            path("__debug__/", include(debug_toolbar.urls)),
+        ] + urlpatterns
