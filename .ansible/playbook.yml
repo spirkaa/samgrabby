@@ -1,0 +1,44 @@
+- hosts: all
+  gather_facts: no
+
+  vars:
+    ct_registry: "{{ lookup('env','REGISTRY') }}"
+    ct_name: "{{ lookup('env','IMAGE_NAME') }}"
+    ct_tag: "{{ lookup('env','GIT_COMMIT') }}"
+    ct_image: "{{ ct_registry }}/{{ ct_name }}:{{ ct_tag }}"
+    ct_port: 5001
+    ct_volume: "{{ ct_name }}-app-data"
+    django_settings_module: config.settings.production
+    django_allowed_hosts: soft.devmem.ru
+    django_secret_key: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          30396338626633343538343966313065363134363266346535373135353336646663373835363866
+          3731336262613430353230363436353531646666613266380a623538633037303239633462373666
+          61313262373566316434316161623831353735653632306663356134326262343339333132613830
+          6430353065313238300a636132356438656463343734303861333437363037383564316361333334
+          65633334326336633464343162383632663632306239643333323334653238323462613466373262
+          32373434313934666339323032303561356264633263363664353034356439353734623838316533
+          62363134343033616537616434613232386561356135653164666134393937316430386235343731
+          35666135666231336332
+
+  tasks:
+    - name: "{{ ct_name }} - create volume"
+      docker_volume:
+        name: "{{ ct_volume }}"
+
+    - name: "{{ ct_name }} - start container"
+      docker_container:
+        name: "{{ ct_name }}"
+        image: "{{ ct_image }}"
+        pull: yes
+        ports:
+          - "{{ ct_port }}:5000"
+        env:
+          DJANGO_SETTINGS_MODULE: "{{ django_settings_module }}"
+          DJANGO_ALLOWED_HOSTS: "{{ django_allowed_hosts }}"
+          DJANGO_SECRET_KEY: "{{ django_secret_key }}"
+        volumes:
+          - "{{ ct_volume }}:/app/data"
+        restart_policy: unless-stopped
+        state: started
+      no_log: true

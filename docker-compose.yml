@@ -12,7 +12,7 @@ services:
   django:
     build:
       context: .
-      dockerfile: .docker/django/Dockerfile
+      dockerfile: .docker/django/Dockerfile-compose
     volumes:
       - "app-data:/app/data"
     env_file: .env
