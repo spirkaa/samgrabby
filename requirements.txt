@@ -1,1 +1,1 @@
--r samgrabby/requirements/production.txt
+pre-commit==2.16.0

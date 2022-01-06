@@ -1,6 +1,6 @@
 from .common import *  # noqa
 
-SECRET_KEY = env('DJANGO_SECRET_KEY', default='djangolocalsettingssecretkey!123)')
+SECRET_KEY = env("DJANGO_SECRET_KEY", default="djangolocalsettingssecretkey!123)")
 
 if DEBUG:  # pragma: no cover
     INTERNAL_IPS = type(str("c"), (), {"__contains__": lambda *a: True})()

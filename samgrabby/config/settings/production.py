@@ -4,8 +4,8 @@ DEBUG = False
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
 SECRET_KEY = env.str("DJANGO_SECRET_KEY")
 
-INSTALLED_APPS += ['gunicorn']
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+INSTALLED_APPS += ["gunicorn"]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # SECURITY CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -15,7 +15,7 @@ USE_X_FORWARDED_HOST = env.bool("DJANGO_USE_X_FORWARDED_HOST", default=False)
 SECURE_PROXY_SSL_HEADER = env.tuple(
     "DJNAGO_SECURE_PROXY_SSL_HEADER", default=("HTTP_X_FORWARDED_PROTO", "https")
 )
-# SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
+SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
 SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
     "DJANGO_SECURE_CONTENT_TYPE_NOSNIFF", default=True
 )
@@ -36,11 +36,11 @@ X_FRAME_OPTIONS = env.str("DJNAGO_X_FRAME_OPTIONS", default="DENY")
 # CACHING
 # ------------------------------------------------------------------------------
 
-WHITENOISE_MIDDLEWARE = ['whitenoise.middleware.WhiteNoiseMiddleware']
+WHITENOISE_MIDDLEWARE = ["whitenoise.middleware.WhiteNoiseMiddleware"]
 MIDDLEWARE = WHITENOISE_MIDDLEWARE + MIDDLEWARE
-MIDDLEWARE.insert(0, 'django.middleware.gzip.GZipMiddleware')
-MIDDLEWARE.insert(0, 'django.middleware.cache.UpdateCacheMiddleware')
-MIDDLEWARE.append('django.middleware.cache.FetchFromCacheMiddleware')
+MIDDLEWARE.insert(0, "django.middleware.gzip.GZipMiddleware")
+MIDDLEWARE.insert(0, "django.middleware.cache.UpdateCacheMiddleware")
+MIDDLEWARE.append("django.middleware.cache.FetchFromCacheMiddleware")
 
 CACHE_MIDDLEWARE_SECONDS = 3600
 USE_ETAGS = True

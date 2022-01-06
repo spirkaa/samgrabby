@@ -10,12 +10,13 @@ class DownLinkInline(admin.TabularInline):
 
 class SoftAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None,               {'fields': ['name', 'version', 'url_key']}),
-        ('Date information', {'fields': ['upd_date']}),
+        (None, {"fields": ["name", "version", "url_key"]}),
+        ("Date information", {"fields": ["upd_date"]}),
     ]
     inlines = [DownLinkInline]
-    list_display = ('name', 'version', 'upd_date')
-    list_filter = ['upd_date']
-    search_fields = ['name']
+    list_display = ("name", "version", "upd_date")
+    list_filter = ["upd_date"]
+    search_fields = ["name"]
+
 
 admin.site.register(models.Soft, SoftAdmin)

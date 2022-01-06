@@ -6,5 +6,6 @@ class Job(DailyJob):
 
     def execute(self):
         from apps.soft.models import run_db_oper
-        run_db_oper('update')
+
+        run_db_oper("update")
         return

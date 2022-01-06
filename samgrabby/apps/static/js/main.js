@@ -1,5 +1,5 @@
 $(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip();   
+    $('[data-toggle="tooltip"]').tooltip();
 });
 
 $('#commands').on('click', 'input[name="update"]', function(event){
@@ -51,7 +51,7 @@ function linkbuild(links) {
     var linkstring = "<td class='vert-align col-md-6'>"
     $.each(links, function(key, val) {
         link = "<a role='button' class='btn btn-default btn-xs' data-toggle='tooltip' title='"+val[1]+"' href='"+val[1]+"' target='_blank'>"+val[0]+"</a> "
-        linkstring += link  
+        linkstring += link
     });
   console.log(linkstring);
   return linkstring;
