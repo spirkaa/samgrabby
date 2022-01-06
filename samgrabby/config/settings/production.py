@@ -36,10 +36,13 @@ X_FRAME_OPTIONS = env.str("DJNAGO_X_FRAME_OPTIONS", default="DENY")
 # CACHING
 # ------------------------------------------------------------------------------
 
-WHITENOISE_MIDDLEWARE = ["whitenoise.middleware.WhiteNoiseMiddleware"]
-MIDDLEWARE = WHITENOISE_MIDDLEWARE + MIDDLEWARE
-MIDDLEWARE.insert(0, "django.middleware.gzip.GZipMiddleware")
-MIDDLEWARE.insert(0, "django.middleware.cache.UpdateCacheMiddleware")
+CACHE_MIDDLEWARE = [
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.middleware.cache.UpdateCacheMiddleware",
+    "django.middleware.gzip.GZipMiddleware",
+    "django.middleware.http.ConditionalGetMiddleware",
+]
+MIDDLEWARE = MIDDLEWARE[:1] + CACHE_MIDDLEWARE + MIDDLEWARE[1:]
 MIDDLEWARE.append("django.middleware.cache.FetchFromCacheMiddleware")
 
 CACHE_MIDDLEWARE_SECONDS = 3600
