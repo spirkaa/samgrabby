@@ -4,7 +4,7 @@ LABEL maintainer="Ilya Pavlov <piv@devmem.ru>"
 ENV PYTHONUNBUFFERED 1
 ARG CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
-COPY ./requirements /app/requirements
+COPY samgrabby/requirements /app/requirements
 
 RUN set -eux \
     && apk add --no-cache tzdata \
@@ -14,11 +14,13 @@ RUN set -eux \
     && pip install --no-cache-dir -U pip wheel \
     && pip install --no-cache-dir -U -r /app/requirements/production.txt
 
-COPY . /app
-COPY ./compose/django/gunicorn.sh /gunicorn.sh
-COPY ./compose/django/entrypoint.sh /entrypoint.sh
+COPY samgrabby /app
+
+COPY .docker/django/gunicorn.sh /gunicorn.sh
+COPY .docker/django/entrypoint.sh /entrypoint.sh
 
 RUN set -eux \
+    && mkdir /app/data \
     && addgroup django \
     && adduser -D -G django django \
     && chown -R django /app \

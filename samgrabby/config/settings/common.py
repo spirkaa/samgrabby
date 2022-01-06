@@ -7,7 +7,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 
 import environ
 
-ROOT_DIR = environ.Path(__file__) - 3  # (samgrabby/config/settings/common.py - 3 = samgrabby/)
+ROOT_DIR = environ.Path(__file__) - 3  # (app/config/settings/common.py - 3 = app/)
 APPS_DIR = ROOT_DIR.path('apps')
 env = environ.Env()
 
@@ -74,7 +74,7 @@ FIXTURE_DIRS = (
 
 DATABASES = {
     # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
-    'default': env.db('DATABASE_URL', default='sqlite:///db.sqlite3'),
+    'default': env.db('DATABASE_URL', default='sqlite:///data/db.sqlite3'),
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 

@@ -5,18 +5,21 @@ version: '2'
 # docker-compose run django python manage.py createsuperuser
 # docker-compose run django python manage.py runjobs daily
 
+volumes:
+  app-data:
+
 services:
   django:
     build:
       context: .
-      dockerfile: ./compose/django/Dockerfile
+      dockerfile: .docker/django/Dockerfile
     volumes:
-      - ./config/data:/app/config/data
+      - "app-data:/app/data"
     env_file: .env
     restart: always
 
   nginx:
-    build: ./compose/nginx
+    build: .docker/nginx
     depends_on:
       - django
     ports:
