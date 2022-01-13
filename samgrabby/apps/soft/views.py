@@ -1,8 +1,9 @@
 from django.views.generic import ListView
 
 from .models import Soft
+from .samparser import nnmclub_list
 
-torr = ["samdrivers", "1036838", "1350931"]
+torr = ["samdrivers"] + nnmclub_list
 
 
 class IndexView(ListView):

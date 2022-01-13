@@ -25,7 +25,7 @@ samlab_list = [
     "samdrivers",
 ]
 
-nnmclub_list = ["1036838", "1350931"]
+nnmclub_list = ["1521194", "1476139"]
 
 
 def samlab_parser(url_key):
@@ -63,16 +63,8 @@ def nnmclub_parser(url_key):
     response = browser.get(root_url + url_key)
 
     maintitle = response.soup.select('a[class="maintitle"]')[0].text.split(" ")
-    name = "tmp"
-    version = "0"
-    if url_key == "1036838":
-        name = maintitle[0]
-        version = maintitle[6]
-    elif url_key == "1350931":
-        name = maintitle[1]
-        version = maintitle[2]
-    else:
-        pass
+    name = maintitle[0]
+    version = maintitle[1]
 
     upd_date = response.soup.select('td[class="genmed"]')[3].text.strip()
     months = {
@@ -95,7 +87,7 @@ def nnmclub_parser(url_key):
     upd_date = datetime.datetime.strptime(upd_date, "%d %b %Y %H:%M:%S").date()
 
     links = [
-        ["magnet", response.soup.select('td[class="gensmall"] a')[0].attrs.get("href")]
+        ["magnet", response.soup.select('td[class="gensmall"] a')[1].attrs.get("href")]
     ]
 
     res = {
