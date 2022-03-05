@@ -25,11 +25,13 @@ samlab_list = [
     "samdrivers",
 ]
 
-nnmclub_list = ["1521194", "1476139"]
+nnmclub_minstall_id = "1532753"
+nnmclub_jinnsliveusb_id = "1530947"
+nnmclub_list = [nnmclub_minstall_id, nnmclub_jinnsliveusb_id]
 
 
 def samlab_parser(url_key):
-    root_url = "http://samlab.ws/soft/"
+    root_url = "https://samlab.ws/soft/"
     browser = mechanicalsoup.Browser(soup_config={"features": "html.parser"})
     response = browser.get(root_url + url_key)
     name = (
