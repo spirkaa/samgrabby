@@ -1,4 +1,4 @@
 -r common.txt
 django-debug-toolbar==3.2.4
-Werkzeug==2.0.2
-ipython==7.30.1
+Werkzeug==2.0.3
+ipython==8.1.1
