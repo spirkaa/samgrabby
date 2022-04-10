@@ -1,13 +1,19 @@
+---
 - hosts: all
   gather_facts: no
 
   vars:
     ct_registry: "{{ lookup('env','REGISTRY') }}"
+    ct_registry_user: "{{ lookup('env','REGISTRY_USER') }}"
+    ct_registry_password: "{{ lookup('env','REGISTRY_PASSWORD') }}"
+    ct_image_owner: "{{ lookup('env','IMAGE_OWNER') }}"
     ct_name: "{{ lookup('env','IMAGE_NAME') }}"
     ct_tag: "{{ lookup('env','GIT_COMMIT') }}"
-    ct_image: "{{ ct_registry }}/{{ ct_name }}:{{ ct_tag }}"
+
+    ct_image: "{{ ct_registry }}/{{ ct_image_owner }}/{{ ct_name }}:{{ ct_tag }}"
     ct_port: 5001
     ct_volume: "{{ ct_name }}-app-data"
+
     django_settings_module: config.settings.production
     django_allowed_hosts: soft.devmem.ru
     django_secret_key: !vault |
@@ -23,11 +29,18 @@
 
   tasks:
     - name: "{{ ct_name }} - create volume"
-      docker_volume:
+      community.docker.docker_volume:
         name: "{{ ct_volume }}"
 
+    - name: "{{ ct_name }} - log into registry"
+      community.docker.docker_login:
+        registry_url: "{{ ct_registry }}"
+        username: "{{ ct_registry_user }}"
+        password: "{{ ct_registry_password }}"
+        reauthorize: yes
+
     - name: "{{ ct_name }} - start container"
-      docker_container:
+      community.docker.docker_container:
         name: "{{ ct_name }}"
         image: "{{ ct_image }}"
         pull: yes
@@ -42,3 +55,8 @@
         restart_policy: unless-stopped
         state: started
       no_log: true
+
+    - name: "{{ ct_name }} - log out of registry"
+      community.docker.docker_login:
+        registry_url: "{{ ct_registry }}"
+        state: absent
