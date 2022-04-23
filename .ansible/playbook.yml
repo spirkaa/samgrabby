@@ -54,9 +54,21 @@
           - "{{ ct_volume }}:/app/data"
         restart_policy: unless-stopped
         state: started
+      notify: app_start
       no_log: true
 
     - name: "{{ ct_name }} - log out of registry"
       community.docker.docker_login:
         registry_url: "{{ ct_registry }}"
         state: absent
+
+  handlers:
+    - name: check http status
+      uri:
+        url: https://soft.devmem.ru
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 12
+      delay: 5
+      listen: app_start
