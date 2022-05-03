@@ -1,15 +1,59 @@
-FROM registry.home.devmem.ru/python:3.9-alpine
+ARG PYTHON_IMAGE=python:3.10.4-slim-bullseye
 
-ENV PYTHONUNBUFFERED=1
-ARG CRYPTOGRAPHY_DONT_BUILD_RUST=1
+FROM ${PYTHON_IMAGE} AS python
 
-COPY .docker/django/rootfs /
+FROM python AS builder
 
-COPY samgrabby/requirements /app/requirements
+ARG BUILD_ENVIRONMENT=production
+ARG APP_NAME=samgrabby
 
 RUN set -eux \
-    && pip install --no-cache-dir -U -r /app/requirements/production.txt
+    && python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-COPY samgrabby /app
+COPY ${APP_NAME}/requirements .
 
-WORKDIR /app
+RUN set -eux \
+    && pip install --no-cache-dir -r ${BUILD_ENVIRONMENT}.txt
+
+
+FROM python AS runner
+
+ARG APP_NAME=samgrabby
+ARG APP_HOME=/app
+
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR ${APP_HOME}
+
+RUN set -eux \
+    && apt-get update \
+    && apt-get upgrade -y \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /opt/venv /opt/venv
+
+RUN set -eux \
+    && addgroup --system --gid 1000 django \
+    && adduser --system --uid 1000 --ingroup django django
+
+COPY --chown=django:django .docker/django/scripts /
+
+RUN set -eux \
+    && sed -i 's/\r$//g' /entrypoint \
+    && chmod +x /entrypoint \
+    && sed -i 's/\r$//g' /start \
+    && chmod +x /start
+
+COPY --chown=django:django ${APP_NAME} ${APP_HOME}
+
+RUN set -eux \
+    && mkdir ${APP_HOME}/data \
+    && chown -R django:django ${APP_HOME}
+
+USER django
+
+ENV PATH="/opt/venv/bin:$PATH"
+
+ENTRYPOINT [ "/entrypoint" ]

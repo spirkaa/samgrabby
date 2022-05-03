@@ -3,15 +3,15 @@
   gather_facts: no
 
   vars:
+    tz: Europe/Moscow
+
     ct_registry: "{{ lookup('env','REGISTRY') }}"
     ct_registry_user: "{{ lookup('env','REGISTRY_USER') }}"
     ct_registry_password: "{{ lookup('env','REGISTRY_PASSWORD') }}"
-    ct_image_owner: "{{ lookup('env','IMAGE_OWNER') }}"
-    ct_name: "{{ lookup('env','IMAGE_NAME') }}"
-    ct_tag: "{{ lookup('env','GIT_COMMIT') }}"
 
-    ct_image: "{{ ct_registry }}/{{ ct_image_owner }}/{{ ct_name }}:{{ ct_tag }}"
+    ct_image: "{{ lookup('env','IMAGE_FULLNAME') }}:{{ lookup('env','REVISION') }}"
     ct_port: 5001
+    ct_name: soft
     ct_volume: "{{ ct_name }}-app-data"
 
     django_settings_module: config.settings.production
@@ -47,6 +47,7 @@
         ports:
           - "{{ ct_port }}:5000"
         env:
+          TZ: "{{ tz }}"
           DJANGO_SETTINGS_MODULE: "{{ django_settings_module }}"
           DJANGO_ALLOWED_HOSTS: "{{ django_allowed_hosts }}"
           DJANGO_SECRET_KEY: "{{ django_secret_key }}"
@@ -64,7 +65,7 @@
 
   handlers:
     - name: check http status
-      uri:
+      ansible.builtin.uri:
         url: https://soft.devmem.ru
         status_code: 200
       register: result

@@ -1,27 +1,24 @@
 version: '2'
 
-# docker-compose up --build -d
-# docker-compose run django python manage.py migrate
-# docker-compose run django python manage.py createsuperuser
-# docker-compose run django python manage.py runjobs daily
-
 volumes:
-  app-data:
+  app-data: {}
 
 services:
   django:
     build:
       context: .
-      dockerfile: .docker/django/Dockerfile-compose
+      dockerfile: .docker/django/ci.Dockerfile
+      args:
+        - BUILD_ENVIRONMENT=production
     volumes:
-      - "app-data:/app/data"
+      - "app-data:/app/data:z"
     env_file: .env
     restart: always
 
   nginx:
     build: .docker/nginx
-    depends_on:
-      - django
     ports:
       - "8080:80"
+    depends_on:
+      - django
     restart: always

@@ -72,10 +72,9 @@ FIXTURE_DIRS = (str(APPS_DIR.path("fixtures")),)
 
 DATABASES = {
     # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
-    "default": env.db("DATABASE_URL", default="sqlite:///data/db.sqlite3"),
+    "default": env.db("DJANGO_DATABASE_URL", default="sqlite:///data/db.sqlite3"),
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
-
 
 # GENERAL CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -83,7 +82,8 @@ DATABASES["default"]["ATOMIC_REQUESTS"] = True
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
-TIME_ZONE = "Europe/Moscow"
+TIME_ZONE = env.str("TZ", default="UTC")
+USE_TZ = False
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#language-code
 LANGUAGE_CODE = "ru-ru"
@@ -93,9 +93,6 @@ USE_I18N = True
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#use-l10n
 USE_L10N = True
-
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
-USE_TZ = True
 
 # TEMPLATE CONFIGURATION
 # ------------------------------------------------------------------------------
