@@ -1,56 +1,3 @@
-def buildImageCache(String tag, String altTag = null) {
-  IMAGE_TAG = "${tag}"
-  DOCKERFILE = '.docker/django/ci.Dockerfile'
-  docker.withRegistry("${REGISTRY_URL}", "${REGISTRY_CREDS_ID}") {
-    def myImage = docker.build(
-      "${IMAGE_FULLNAME}:${IMAGE_TAG}",
-      "--label \"org.opencontainers.image.created=${LABEL_CREATED}\" \
-      --label \"org.opencontainers.image.authors=${LABEL_AUTHORS}\" \
-      --label \"org.opencontainers.image.url=${LABEL_URL}\" \
-      --label \"org.opencontainers.image.source=${GIT_URL}\" \
-      --label \"org.opencontainers.image.version=${IMAGE_TAG}\" \
-      --label \"org.opencontainers.image.revision=${REVISION}\" \
-      --label \"org.opencontainers.image.title=${LABEL_TITLE}\" \
-      --label \"org.opencontainers.image.description=${LABEL_DESCRIPTION}\" \
-      --progress=plain \
-      --cache-from ${IMAGE_FULLNAME}:${IMAGE_TAG} \
-      -f ${DOCKERFILE} ."
-    )
-    myImage.push()
-    if(altTag) {
-      myImage.push(altTag)
-    }
-    sh "docker rmi -f \$(docker inspect -f '{{ .Id }}' ${myImage.id})"
-  }
-}
-
-def buildImageNoCache(String tag, String altTag = null) {
-  IMAGE_TAG = "${tag}"
-  DOCKERFILE = ".docker/django/ci.Dockerfile"
-  docker.withRegistry("${REGISTRY_URL}", "${REGISTRY_CREDS_ID}") {
-    def myImage = docker.build(
-      "${IMAGE_FULLNAME}:${IMAGE_TAG}",
-      "--label \"org.opencontainers.image.created=${LABEL_CREATED}\" \
-      --label \"org.opencontainers.image.authors=${LABEL_AUTHORS}\" \
-      --label \"org.opencontainers.image.url=${LABEL_URL}\" \
-      --label \"org.opencontainers.image.source=${GIT_URL}\" \
-      --label \"org.opencontainers.image.version=${IMAGE_TAG}\" \
-      --label \"org.opencontainers.image.revision=${REVISION}\" \
-      --label \"org.opencontainers.image.title=${LABEL_TITLE}\" \
-      --label \"org.opencontainers.image.description=${LABEL_DESCRIPTION}\" \
-      --progress=plain \
-      --pull \
-      --no-cache \
-      -f ${DOCKERFILE} ."
-    )
-    myImage.push()
-    if(altTag) {
-      myImage.push(altTag)
-    }
-    sh "docker rmi -f \$(docker inspect -f '{{ .Id }}' ${myImage.id})"
-  }
-}
-
 pipeline {
   agent any
 
@@ -68,17 +15,18 @@ pipeline {
     REGISTRY = 'git.devmem.ru'
     REGISTRY_URL = "https://${REGISTRY}"
     REGISTRY_CREDS_ID = 'gitea-user'
-    IMAGE_OWNER = 'cr'
-    IMAGE_BASENAME = 'soft'
+    IMAGE_OWNER = 'projects'
+    IMAGE_BASENAME = 'samgrabby'
     IMAGE_FULLNAME = "${REGISTRY}/${IMAGE_OWNER}/${IMAGE_BASENAME}"
+    DOCKERFILE = '.docker/django/ci.Dockerfile'
     LABEL_AUTHORS = 'Ilya Pavlov <piv@devmem.ru>'
-    LABEL_TITLE = 'soft'
-    LABEL_DESCRIPTION = 'soft'
+    LABEL_TITLE = 'samgrabby'
+    LABEL_DESCRIPTION = 'samgrabby'
     LABEL_URL = 'https://soft.devmem.ru'
     LABEL_CREATED = sh(script: "date '+%Y-%m-%dT%H:%M:%S%:z'", returnStdout: true).toString().trim()
     REVISION = GIT_COMMIT.take(7)
 
-    ANSIBLE_IMAGE = "${REGISTRY}/${IMAGE_OWNER}/ansible:base"
+    ANSIBLE_IMAGE = "${REGISTRY}/projects/ansible:base"
     ANSIBLE_CONFIG = '.ansible/ansible.cfg'
     ANSIBLE_PLAYBOOK = '.ansible/playbook.yml'
     ANSIBLE_INVENTORY = '.ansible/hosts'
@@ -93,46 +41,43 @@ pipeline {
   }
 
   stages {
-    stage('Set env vars') {
+    stage('Build image (cache)') {
+      when {
+        not {
+          anyOf {
+            expression { params.DEPLOY }
+            expression { params.REBUILD }
+            triggeredBy 'TimerTrigger'
+            triggeredBy cause: 'UserIdCause'
+          }
+        }
+      }
       steps {
         script {
-          env.DOCKER_BUILDKIT = 1
+          buildDockerImage(
+            dockerFile: "${DOCKERFILE}",
+            tag: "${REVISION}",
+            altTag: 'latest',
+            useCache: true
+          )
         }
       }
     }
 
-    stage('Build') {
-      parallel {
-        stage('Build image (no cache)') {
-          when {
-            anyOf {
-              expression { params.REBUILD }
-              triggeredBy 'TimerTrigger'
-            }
-          }
-          steps {
-            script {
-              buildImageNoCache("${REVISION}", 'latest')
-            }
-          }
+    stage('Build image (no cache)') {
+      when {
+        anyOf {
+          expression { params.REBUILD }
+          triggeredBy 'TimerTrigger'
         }
-
-        stage('Build image') {
-          when {
-            not {
-              anyOf {
-                expression { params.DEPLOY }
-                expression { params.REBUILD }
-                triggeredBy 'TimerTrigger'
-                triggeredBy cause: 'UserIdCause'
-              }
-            }
-          }
-          steps {
-            script {
-              buildImageCache("${REVISION}", 'latest')
-            }
-          }
+      }
+      steps {
+        script {
+          buildDockerImage(
+            dockerFile: "${DOCKERFILE}",
+            tag: "${REVISION}",
+            altTag: 'latest'
+          )
         }
       }
     }

@@ -5,7 +5,7 @@ export COMPOSE_DOCKER_CLI_BUILD=1
 
 default: build
 
-IMAGE_FULLNAME=git.devmem.ru/cr/soft
+IMAGE_FULLNAME=git.devmem.ru/projects/samgrabby
 build:
 	@docker build \
 		--tag ${IMAGE_FULLNAME} \
