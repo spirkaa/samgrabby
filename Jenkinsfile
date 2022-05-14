@@ -18,6 +18,7 @@ pipeline {
     IMAGE_OWNER = 'projects'
     IMAGE_BASENAME = 'samgrabby'
     IMAGE_FULLNAME = "${REGISTRY}/${IMAGE_OWNER}/${IMAGE_BASENAME}"
+    IMAGE_ALT_TAG = 'latest'
     DOCKERFILE = '.docker/django/ci.Dockerfile'
     LABEL_AUTHORS = 'Ilya Pavlov <piv@devmem.ru>'
     LABEL_TITLE = 'samgrabby'
@@ -26,7 +27,7 @@ pipeline {
     LABEL_CREATED = sh(script: "date '+%Y-%m-%dT%H:%M:%S%:z'", returnStdout: true).toString().trim()
     REVISION = GIT_COMMIT.take(7)
 
-    ANSIBLE_IMAGE = "${REGISTRY}/projects/ansible:base"
+    ANSIBLE_IMAGE = "${REGISTRY}/${IMAGE_OWNER}/ansible:base"
     ANSIBLE_CONFIG = '.ansible/ansible.cfg'
     ANSIBLE_PLAYBOOK = '.ansible/playbook.yml'
     ANSIBLE_INVENTORY = '.ansible/hosts'
@@ -57,8 +58,9 @@ pipeline {
           buildDockerImage(
             dockerFile: "${DOCKERFILE}",
             tag: "${REVISION}",
-            altTag: 'latest',
-            useCache: true
+            altTag: "${IMAGE_ALT_TAG}",
+            useCache: true,
+            cacheFrom: "${IMAGE_FULLNAME}:${IMAGE_ALT_TAG}"
           )
         }
       }
@@ -76,7 +78,7 @@ pipeline {
           buildDockerImage(
             dockerFile: "${DOCKERFILE}",
             tag: "${REVISION}",
-            altTag: 'latest'
+            altTag: "${IMAGE_ALT_TAG}"
           )
         }
       }
