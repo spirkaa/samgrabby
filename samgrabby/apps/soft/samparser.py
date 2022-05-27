@@ -1,8 +1,11 @@
 import datetime
+import logging
 import re
 from multiprocessing.pool import ThreadPool
 
 import mechanicalsoup
+
+logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 samlab_list = [
     "7zip",

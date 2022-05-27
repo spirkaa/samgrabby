@@ -28,10 +28,6 @@
           35666135666231336332
 
   tasks:
-    - name: "{{ ct_name }} - create volume"
-      community.docker.docker_volume:
-        name: "{{ ct_volume }}"
-
     - name: "{{ ct_name }} - log into registry"
       community.docker.docker_login:
         registry_url: "{{ ct_registry }}"
@@ -51,8 +47,6 @@
           DJANGO_SETTINGS_MODULE: "{{ django_settings_module }}"
           DJANGO_ALLOWED_HOSTS: "{{ django_allowed_hosts }}"
           DJANGO_SECRET_KEY: "{{ django_secret_key }}"
-        volumes:
-          - "{{ ct_volume }}:/app/data"
         restart_policy: unless-stopped
         state: started
       notify: app_start

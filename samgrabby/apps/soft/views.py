@@ -14,7 +14,7 @@ class IndexView(ListView):
         return self.model.objects.prefetch_related("links").all()
 
     def get_context_data(self, **kwargs):
-        context = super(IndexView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         qs = list(self.object_list)
         context["soft_list"] = [i for i in qs if i.url_key not in torr]
         context["torrent_list"] = [i for i in qs if i.url_key in torr[1:]]
