@@ -44,12 +44,14 @@ pipeline {
   stages {
     stage('Build image (cache)') {
       when {
+        branch 'main'
         not {
           anyOf {
             expression { params.DEPLOY }
             expression { params.REBUILD }
             triggeredBy 'TimerTrigger'
             triggeredBy cause: 'UserIdCause'
+            changeRequest()
           }
         }
       }
@@ -68,6 +70,7 @@ pipeline {
 
     stage('Build image (no cache)') {
       when {
+        branch 'main'
         anyOf {
           expression { params.REBUILD }
           triggeredBy 'TimerTrigger'
@@ -95,6 +98,7 @@ pipeline {
         }
       }
       when {
+        branch 'main'
         beforeAgent true
         expression { params.DEPLOY }
       }
