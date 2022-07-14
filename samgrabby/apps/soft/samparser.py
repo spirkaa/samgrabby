@@ -108,8 +108,9 @@ def nnmclub_parser(url_key):
 def parser():
     with ThreadPool(8) as pool:
         list_one = pool.map(samlab_parser, samlab_list)
-        list_two = pool.map(nnmclub_parser, nnmclub_list)
-        return list_one + list_two
+        # list_two = pool.map(nnmclub_parser, nnmclub_list)
+        # return list_one + list_two
+        return list_one
 
 
 if __name__ == "__main__":
