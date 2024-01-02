@@ -9,3 +9,4 @@ django-environ==0.11.2
 
 # Libs for parser
 MechanicalSoup==1.3.0
+tenacity==8.2.3

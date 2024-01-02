@@ -1,7 +1,10 @@
+import logging
+
 from django.db import models
 
 from .decorators import async_f
-from .samparser import parser
+
+logger = logging.getLogger(__name__)
 
 
 class Soft(models.Model):
@@ -10,13 +13,13 @@ class Soft(models.Model):
     upd_date = models.DateField("date updated")
     url_key = models.SlugField("url slug", unique=True)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         verbose_name = "Soft entry"
-        verbose_name_plural = "Soft enries"
+        verbose_name_plural = "Soft entries"
         ordering = ["-upd_date"]
+
+    def __str__(self):
+        return str(self.name)
 
 
 class DownLink(models.Model):
@@ -25,49 +28,23 @@ class DownLink(models.Model):
     dl_url_text = models.CharField("text for download url", max_length=100)
 
     def __str__(self):
-        return self.dl_url_text
-
-
-def add_links(links, itempk):
-    for link in links:
-        DownLink(dl_url=link[1], dl_url_text=link[0], soft_id=itempk).save()
-
-
-def db_operations(results, operation):
-    for r in results:
-        if operation == "populate":
-            try:
-                item = Soft(
-                    name=r["name"],
-                    version=r["version"],
-                    upd_date=r["upd_date"],
-                    url_key=r["url_key"],
-                )
-                item.save()
-                if item.pk:
-                    add_links(r["links"], item.pk)
-            except:  # noqa
-                pass
-        elif operation == "update":
-            item, created = Soft.objects.get_or_create(
-                url_key=r["url_key"],
-                defaults={
-                    "name": r["name"],
-                    "version": r["version"],
-                    "upd_date": r["upd_date"],
-                },
-            )
-            if created:
-                add_links(r["links"], item.pk)
-            elif item.upd_date < r["upd_date"]:
-                item.version = r["version"]
-                item.upd_date = r["upd_date"]
-                item.save()
-                DownLink.objects.filter(soft_id=item.id).delete()
-                add_links(r["links"], item.pk)
+        return str(self.dl_url_text)
 
 
 @async_f
-def run_db_oper(operation):
-    results = parser()
-    db_operations(results, operation)
+def update_db():
+    from .samparser import get_soft_data
+
+    data = get_soft_data()
+    for entry in data:
+        obj, _ = Soft.objects.update_or_create(
+            url_key=entry.url_key,
+            defaults={
+                "name": entry.name,
+                "version": entry.version,
+                "upd_date": entry.upd_date,
+            },
+        )
+        DownLink.objects.filter(soft=obj).delete()
+        for link in entry.links:
+            DownLink(soft=obj, dl_url=link.dl_url, dl_url_text=link.dl_url_text).save()
