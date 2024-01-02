@@ -112,9 +112,6 @@ LANGUAGE_CODE = "ru-ru"
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
 USE_I18N = True
 
-# https://docs.djangoproject.com/en/dev/ref/settings/#use-l10n
-USE_L10N = True
-
 # TEMPLATE CONFIGURATION
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#templates
@@ -140,12 +137,6 @@ TEMPLATES = [
         },
     },
 ]
-
-BOOTSTRAP3 = {
-    "jquery_url": "/static/js/jquery.min.js",
-    "css_url": "/static/css/bootstrap.min.css",
-    "javascript_url": "/static/js/bootstrap.min.js",
-}
 
 # STATIC FILE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -237,6 +228,12 @@ LOGGING = {
             "level": env.str("DJANGO_LOG_LEVEL", default="INFO"),
         },
     },
+}
+
+BOOTSTRAP3 = {
+    "jquery_url": "/static/js/jquery.min.js",
+    "css_url": "/static/css/bootstrap.min.css",
+    "javascript_url": "/static/js/bootstrap.min.js",
 }
 
 # ------------------------------------------------------------------------------

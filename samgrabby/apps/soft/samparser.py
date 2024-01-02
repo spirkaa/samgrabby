@@ -52,14 +52,13 @@ def samlab_parser(url_key):
     links = response.soup.select('div[class="links"] a')
     links = [[a.get_text(), a.attrs.get("href")] for a in links]
 
-    res = {
+    return {
         "name": name,
         "version": version,
         "upd_date": upd_date,
         "url_key": url_key,
         "links": links,
     }
-    return res
 
 
 def nnmclub_parser(url_key):
@@ -95,22 +94,20 @@ def nnmclub_parser(url_key):
         ["magnet", response.soup.select('td[class="gensmall"] a')[1].attrs.get("href")]
     ]
 
-    res = {
+    return {
         "name": name,
         "version": version,
         "upd_date": upd_date,
         "url_key": url_key,
         "links": links,
     }
-    return res
 
 
 def parser():
-    with ThreadPool(8) as pool:
-        list_one = pool.map(samlab_parser, samlab_list)
+    with ThreadPool(1) as pool:  # 1 thread to avoid 509 error
+        return pool.map(samlab_parser, samlab_list)
         # list_two = pool.map(nnmclub_parser, nnmclub_list)
         # return list_one + list_two
-        return list_one
 
 
 if __name__ == "__main__":

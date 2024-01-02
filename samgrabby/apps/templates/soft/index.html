@@ -1,64 +1,57 @@
 {% extends 'soft/base.html' %}
-
 {% load bootstrap3 %}
 {% load humanize %}
-
 {% block content %}
-<div class="dpad container-fluid">
+  <div class="dpad container-fluid">
     <div class="bottom-buffer">
-        <h1>{% block title %}SamGrabby{% endblock %}</h1>
-        <p>
-            Grab your favorite software from
-            <a href="https://samlab.ws"
-               target="_blank"
-               rel="noopener noreferrer">SamLab.ws</a>
-        </p>
-        {% include 'soft/messages.html' %}
-        {% if soft_list %}
-{#        <form method="post" id="commands">{% csrf_token %}#}
-{#            <input type="submit" name="update" class="btn btn-primary" value="Update data"/>#}
-{#            <input type="submit" name="wipe" class="btn btn-danger" value="Wipe data"/>#}
-{#        </form>#}
-        </div>
-        <table data-toggle="table" data-mobile-responsive="true" class="table table-no-bordered">
-            <thead>
+      <h1>
+        {% block title %}SamGrabby{% endblock %}
+      </h1>
+      <p>
+        Grab your favorite software from
+        <a href="https://samlab.ws" target="_blank" rel="noopener noreferrer">SamLab.ws</a>
+      </p>
+      {% include 'soft/messages.html' %}
+      {% if soft_list %}
+      </div>
+      <table data-toggle="table"
+             data-mobile-responsive="true"
+             class="table table-no-bordered">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Version</th>
+            <th>Last update</th>
+            <th>Links</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for result in soft_list %}
             <tr>
-                <th>Name</th>
-                <th>Version</th>
-                <th>Last update</th>
-                <th>Links</th>
+              <td class="vert-align">
+                <a href="https://samlab.ws/soft/{{ result.url_key }}"
+                   target="_blank"
+                   rel="noopener noreferrer">{{ result.name }}</a>
+              </td>
+              <td class="vert-align">{{ result.version }}</td>
+              <td class="vert-align">{{ result.upd_date|naturalday }}</td>
+              <td class="vert-align col-md-6">
+                {% for link in result.links.all %}
+                  <a role="button"
+                     class="btn btn-default btn-xs"
+                     data-toggle="tooltip"
+                     title="{{ link.dl_url }}"
+                     href="{{ link.dl_url }}"
+                     target="_blank"
+                     rel="noopener noreferrer">{{ link.dl_url_text }}</a>
+                {% endfor %}
+              </td>
             </tr>
-            </thead>
-            <tbody>
-            {% for result in soft_list %}
-            <tr>
-                <td class="vert-align">
-                    <a href="https://samlab.ws/soft/{{ result.url_key }}"
-                       target="_blank"
-                       rel="noopener noreferrer">{{ result.name }}</a>
-                </td>
-                <td class="vert-align">{{ result.version }}</td>
-                <td class="vert-align">{{ result.upd_date|naturalday }}</td>
-                <td class="vert-align col-md-6">
-                    {% for link in result.links.all %}
-                    <a role="button"
-                       class="btn btn-default btn-xs"
-                       data-toggle="tooltip"
-                       title="{{ link.dl_url }}"
-                       href="{{ link.dl_url }}"
-                       target="_blank"
-                       rel="noopener noreferrer">{{ link.dl_url_text }}</a>
-                    {% endfor %}
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-{#        <form method="post">{% csrf_token %}#}
-{#            <input type="submit" name="populate" class="btn btn-success" value="Parse data"/>#}
-{#        </form>#}
-        <p>No records found!</p>
-        {% endif %}
-</div>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No records found!</p>
+    {% endif %}
+  </div>
 {% endblock %}
