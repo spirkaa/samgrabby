@@ -1,5 +1,5 @@
 # Django
-django==4.2.8
+django==4.2.15
 django-bootstrap3==23.6
 django-extensions==3.2.3
 
