@@ -1,12 +1,12 @@
 # Django
-django==4.2.8
-django-bootstrap3==23.6
+django==4.2.18
+django-bootstrap3==24.3
 django-extensions==3.2.3
 
 # Configuration
 django-dotenv==1.4.2
-django-environ==0.11.2
+django-environ==0.12.0
 
 # Libs for parser
 MechanicalSoup==1.3.0
-tenacity==8.2.3
+stamina==24.3.0

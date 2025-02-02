@@ -5,14 +5,10 @@ import re
 from dataclasses import dataclass
 from datetime import date, datetime
 
+import stamina
 from bs4 import BeautifulSoup
 from mechanicalsoup import StatefulBrowser
-from tenacity import (
-    before_sleep_log,
-    retry,
-    stop_after_attempt,
-    wait_random_exponential,
-)
+from requests import HTTPError
 
 logger = logging.getLogger(__name__)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
@@ -54,12 +50,7 @@ class Soft:
     links: list[DownLink]
 
 
-@retry(
-    wait=wait_random_exponential(multiplier=1, max=10),
-    stop=stop_after_attempt(10),
-    before_sleep=before_sleep_log(logger, logging.DEBUG),
-    reraise=True,
-)
+@stamina.retry(on=HTTPError, attempts=5)
 def get_page_soup(browser: StatefulBrowser, url_key: str) -> BeautifulSoup:
     """Get soup from samlab page."""
     logger.debug("Get page soup for %s", url_key)
